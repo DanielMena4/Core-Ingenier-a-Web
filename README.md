@@ -66,7 +66,7 @@ git clone https://github.com/DanielMena4/Core-Ingenier-a-Web.git
 ```
 cd backend
 npm install
-npm run dev
+node src/server.js
 ```
 
 ---
