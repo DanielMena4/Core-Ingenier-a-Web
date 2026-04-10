@@ -1,0 +1,58 @@
+<h2>Partidos</h2>
+
+<form (ngSubmit)="createMatch()">
+
+    <select [(ngModel)]="newMatch.home_team_id" name="home">
+        <option [ngValue]="null">Equipo local</option>
+        @for (team of teams; track team.id) {
+        <option [ngValue]="team.id">{{ team.name }}</option>
+        }
+    </select>
+
+    <select [(ngModel)]="newMatch.away_team_id" name="away">
+        <option [ngValue]="null">Equipo visitante</option>
+        @for (team of teams; track team.id) {
+        <option [ngValue]="team.id">{{ team.name }}</option>
+        }
+    </select>
+
+    <input type="datetime-local" [(ngModel)]="newMatch.match_date" name="date">
+
+    <button type="submit">Crear</button>
+</form>
+
+<hr>
+
+@if (matches.length > 0) {
+<ul>
+    @for (match of matches; track match.id) {
+    <li>
+        {{ match.home_team_name }} vs {{ match.away_team_name }}
+        ({{ match.match_date }})
+        <button (click)="editMatch(match)">Editar</button>
+        @if (editingMatch) {
+        <h3>Editar partido</h3>
+
+        <select [(ngModel)]="editingMatch.home_team_id">
+            @for (team of teams; track team.id) {
+            <option [ngValue]="team.id">{{ team.name }}</option>
+            }
+        </select>
+
+        <select [(ngModel)]="editingMatch.away_team_id">
+            @for (team of teams; track team.id) {
+            <option [ngValue]="team.id">{{ team.name }}</option>
+            }
+        </select>
+
+        <input type="datetime-local" [(ngModel)]="editingMatch.match_date">
+
+        <button (click)="updateMatch()">Guardar</button>
+        }
+        <button (click)="deleteMatch(match.id)">Eliminar</button>
+    </li>
+    }
+</ul>
+} @else {
+<p>No hay partidos</p>
+}

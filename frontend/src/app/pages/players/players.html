@@ -1,0 +1,63 @@
+<h2>Jugadores</h2>
+
+<form (ngSubmit)="createPlayer()">
+    <input [(ngModel)]="newPlayer.name" name="name" placeholder="Nombre">
+
+    <select [(ngModel)]="newPlayer.team_id" name="team_id">
+        <option [ngValue]="null">Seleccionar equipo</option>
+
+        @for (team of teams; track team.id) {
+        <option [ngValue]="+team.id">
+            {{ team.name }}
+        </option>
+        }
+    </select>
+
+    <input [(ngModel)]="newPlayer.position" name="position" placeholder="Posición">
+
+    <button type="submit">Crear</button>
+</form>
+
+<hr>
+
+@if (editingPlayer) {
+<h3>Editar jugador</h3>
+
+<input [(ngModel)]="editingPlayer.name" placeholder="Nombre">
+
+
+<select [(ngModel)]="editingPlayer.team_id" name="team_id">
+    <option [ngValue]="null">Seleccionar equipo</option>
+
+    @for (team of teams; track team.id) {
+    <option [ngValue]="+team.id">
+        {{ team.name }}
+    </option>
+    }
+</select>
+<input [(ngModel)]="editingPlayer.position" placeholder="Posición">
+
+<button (click)="updatePlayer()">Guardar</button>
+}
+
+@if (players.length > 0) {
+<ul>
+    @for (player of players; track player.id) {
+    <li>
+
+        {{ player.name }} - {{ player.team_name }}
+
+        <button (click)="editPlayer(player)">Editar</button>
+        <button (click)="deletePlayer(player.id)">Eliminar</button>
+
+        <button (click)="toggleFavorite(player.id)">
+            <span [style.color]="isFavorite(player.id) ? 'gold' : 'gray'">
+                ★
+            </span>
+        </button>
+    </li>
+    }
+</ul>
+} @else {
+<p>Cargando jugadores...</p>
+}

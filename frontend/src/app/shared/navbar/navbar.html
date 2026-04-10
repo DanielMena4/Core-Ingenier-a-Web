@@ -1,0 +1,18 @@
+<nav style="display:flex; gap:20px; padding:10px; background:#222; color:white;">
+    <a routerLink="/home" style="color:white;">Home</a>
+
+    @if (auth.isLoggedIn()) {
+    <a routerLink="/favorites">Favoritos</a>
+    <a routerLink="/players">Jugadores</a>
+    <a routerLink="/teams">Equipos</a>
+    <a routerLink="/matches">Partidos</a>
+    <span>
+        {{ auth.getUser()?.username }}
+    </span>
+    }
+
+    @if (auth.isLoggedIn()) {
+    <button (click)="logout()">Logout</button>
+    }
+
+</nav>

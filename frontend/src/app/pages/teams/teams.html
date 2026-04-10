@@ -1,0 +1,33 @@
+<h2>Equipos</h2>
+
+<form (ngSubmit)="createTeam()">
+    <input [(ngModel)]="newTeam.name" name="name" placeholder="Nombre">
+    <input [(ngModel)]="newTeam.city" name="city" placeholder="Ciudad">
+    <button>Crear</button>
+</form>
+
+<hr>
+
+@if (editingTeam) {
+<h3>Editar equipo</h3>
+
+<input [(ngModel)]="editingTeam.name">
+<input [(ngModel)]="editingTeam.city">
+
+<button (click)="updateTeam()">Guardar</button>
+}
+
+@if (teams.length > 0) {
+<ul>
+    @for (team of teams; track team.id) {
+    <li>
+        {{ team.name }} ({{ team.city }})
+
+        <button (click)="editTeam(team)">Editar</button>
+        <button (click)="deleteTeam(team.id)">Eliminar</button>
+    </li>
+    }
+</ul>
+} @else {
+<p>Cargando equipos...</p>
+}

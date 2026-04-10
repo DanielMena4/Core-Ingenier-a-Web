@@ -1,0 +1,73 @@
+# ========================
+# FRONTEND
+# ========================
+
+frontend/dist
+frontend/tmp
+frontend/out-tsc
+frontend/.angular
+frontend/.angular/cache
+
+# ========================
+# BACKEND
+# ========================
+
+backend/node_modules
+backend/dist
+
+# ========================
+# GLOBAL
+# ========================
+
+node_modules
+npm-debug.log
+yarn-error.log
+
+# ========================
+# IDEs and editors
+# ========================
+
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/*
+
+# ========================
+# Logs & misc
+# ========================
+
+*.log
+.sass-cache/
+.connect.lock
+coverage
+/libpeerconnection.log
+testem.log
+typings
+__screenshots__/
+
+# ========================
+# ENV
+# ========================
+
+.env
+backend/.env
+frontend/.env
+
+# ========================
+# System files
+# ========================
+
+.DS_Store
+Thumbs.db
