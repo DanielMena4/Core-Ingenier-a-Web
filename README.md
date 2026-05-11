@@ -45,8 +45,7 @@ Además, incluye autenticación segura con JWT y protección de rutas para usuar
 
 - Angular
 - TypeScript
-- HTML5
-- CSS3
+- HTML
 
 ## Backend
 
