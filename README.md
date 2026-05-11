@@ -4,54 +4,73 @@
 
 ---
 
-## 📌 Descripción del Proyecto
+# 📌 Descripción del Proyecto
 
-Aplicación web fullstack para la gestión de jugadores, equipos y partidos de baloncesto.
-Permite a los usuarios registrarse, iniciar sesión y gestionar sus favoritos, además de administrar información de equipos y partidos.
+Aplicación web fullstack para la administración de información de baloncesto.
 
----
+El sistema permite gestionar jugadores, equipos, partidos y estadísticas mediante una arquitectura MVC utilizando Angular en el frontend y Node.js + Express en el backend.
 
-## ⚙️ Funcionalidades
-
-*  Autenticación con JWT (login y registro)
-*  CRUD de jugadores
-*  CRUD de equipos
-*  CRUD de partidos
-*  Sistema de favoritos por usuario
-*  Protección de rutas (Auth Guard + Middleware)
+Además, incluye autenticación segura con JWT y protección de rutas para usuarios autenticados.
 
 ---
 
-## 🖥️ Tecnologías utilizadas
+# ⚙️ Funcionalidades
 
-### Frontend
+## 🔐 Autenticación
 
-* Angular
-* TypeScript
-* HTML / CSS
+- Registro de usuarios
+- Inicio de sesión
+- Autenticación mediante JWT
+- Protección de rutas
+- Validación backend de contraseñas seguras
 
-### Backend
+## 🏀 Gestión deportiva
 
-* Node.js
-* Express
-* MySQL
+- CRUD de jugadores
+- CRUD de equipos
+- CRUD de partidos
+- CRUD de estadísticas
 
-### Otros
+## 🔗 Relaciones entre tablas
 
-* JWT (autenticación)
+- Jugadores asociados a equipos
+- Estadísticas asociadas a jugadores y partidos
+- Selección de relaciones mediante dropdowns dinámicos
 
 ---
 
-## 📁 Estructura del proyecto
+# 🖥️ Tecnologías utilizadas
 
-```
+## Frontend
+
+- Angular
+- TypeScript
+- HTML5
+- CSS3
+
+## Backend
+
+- Node.js
+- Express.js
+- MySQL
+
+## Seguridad
+
+- JWT Authentication
+- Middleware de autorización
+- Validaciones backend
+
+---
+
+# 📁 Estructura del proyecto
+
+```bash
 /frontend   → Aplicación Angular
-/backend    → API REST con Express
-```
+/backend    → API REST con Express y MySQL
 
 ---
 
-## 🚀 Cómo ejecutar el proyecto
+## 🚀 Instalación y ejecución
 
 ### 1. Clonar repositorio
 
@@ -90,12 +109,6 @@ Debes registrarte e iniciar sesión para usar la aplicación.
 ## 📌 Estado del proyecto
 
 🚧 En desarrollo
-Próximas mejoras:
-
-* Comentarios en partidos
-* Reacciones tipo redes sociales
-* Threads de discusión
-* Mejoras de UI/UX
 
 ---
 
