@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environmets/environment';
+
 
 @Injectable({ providedIn: 'root' })
 export class MatchesService {
 
-  private api = 'http://localhost:3000/api/matches';
+  private api = `${environment.apiUrl}`;
+
 
   constructor(private http: HttpClient) { }
 

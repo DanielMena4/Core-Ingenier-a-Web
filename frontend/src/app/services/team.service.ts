@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environmets/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeamService {
 
-  private API = 'http://localhost:3000/api/teams';
+  private API = `${environment.apiUrl}`;
+  
 
   constructor(private http: HttpClient) { }
 
