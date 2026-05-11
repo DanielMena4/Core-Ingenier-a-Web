@@ -66,7 +66,7 @@ Además, incluye autenticación segura con JWT y protección de rutas para usuar
 ```bash
 /frontend   → Aplicación Angular
 /backend    → API REST con Express y MySQL
-
+```
 ---
 
 ## 🚀 Instalación y ejecución
