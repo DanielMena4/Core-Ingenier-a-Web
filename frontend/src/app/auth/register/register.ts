@@ -15,12 +15,27 @@ export class Register {
   email = '';
   password = '';
 
+  errorMessage = '';
+
   constructor(private auth: AuthService, private router: Router) { }
 
   register() {
     this.auth.register(this.username, this.email, this.password)
-      .subscribe(() => {
-        this.router.navigate(['/']);
+      .subscribe({
+
+        next: () => {
+
+          this.router.navigate(['/']);
+
+        },
+
+        error: (err) => {
+
+          this.errorMessage =
+            err.error.message;
+
+        }
+
       });
   }
 }

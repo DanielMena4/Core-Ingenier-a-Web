@@ -1,0 +1,77 @@
+<h2>Lineup Details</h2>
+
+<form (ngSubmit)="createDetail()">
+
+    <select [(ngModel)]="newDetail.lineup_id" name="lineup_id">
+
+        <option [ngValue]="null">
+            Seleccionar alineación
+        </option>
+
+        @for (lineup of lineups; track lineup.id) {
+
+        <option [ngValue]="lineup.id">
+            {{ lineup.name }}
+        </option>
+
+        }
+
+    </select>
+
+    <select [(ngModel)]="newDetail.player_id" name="player_id">
+
+        <option [ngValue]="null">
+            Seleccionar jugador
+        </option>
+
+        @for (player of players; track player.id) {
+
+        <option [ngValue]="player.id">
+            {{ player.name }}
+        </option>
+
+        }
+
+    </select>
+
+    <button type="submit">
+        Agregar
+    </button>
+
+</form>
+
+<hr>
+
+@if (lineupDetails.length > 0) {
+
+<ul>
+
+    @for (detail of lineupDetails; track detail.id) {
+
+    <li>
+
+        <strong>
+            {{ detail.lineup_name }}
+        </strong>
+
+        -
+
+        {{ detail.player_name }}
+
+        ({{ detail.position }})
+
+        <button (click)="deleteDetail(detail.id)">
+            ❌
+        </button>
+
+    </li>
+
+    }
+
+</ul>
+
+} @else {
+
+<p>No hay jugadores en alineaciones</p>
+
+}

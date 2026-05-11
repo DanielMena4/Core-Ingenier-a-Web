@@ -3,21 +3,49 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.register = (req, res) => {
-    const { username, email, password } = req.body;
 
-    const hashedPassword = bcrypt.hashSync(password, 8);
+    const {
+        username,
+        email,
+        password
+    } = req.body;
+
+    const passwordRegex =
+        /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+
+        return res.status(400).json({
+
+            message:
+                'La contraseña debe tener mínimo 8 caracteres, una mayúscula, un número y un carácter especial'
+
+        });
+    }
+
+    const hashedPassword =
+        bcrypt.hashSync(password, 8);
 
     db.query(
         'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-        [username, email, hashedPassword],
-        (err, result) => {
-            if (err) return res.status(500).json(err);
+        [
+            username,
+            email,
+            hashedPassword
+        ],
 
-            res.json({ message: 'Usuario registrado correctamente' });
+        (err, result) => {
+
+            if (err)
+                return res.status(500).json(err);
+
+            res.json({
+                message:
+                    'Usuario registrado correctamente'
+            });
         }
     );
 };
-
 exports.login = (req, res) => {
     const { email, password } = req.body;
 

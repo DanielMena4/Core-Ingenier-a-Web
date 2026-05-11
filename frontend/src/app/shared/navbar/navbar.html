@@ -1,18 +1,43 @@
-<nav style="display:flex; gap:20px; padding:10px; background:#222; color:white;">
-    <a routerLink="/home" style="color:white;">Home</a>
+<nav style="display:flex; gap:20px; padding:10px; background:#222; color:white; align-items:center;">
+
+    <a routerLink="/home" style="color:white;">
+        Home
+    </a>
 
     @if (auth.isLoggedIn()) {
-    <!-- <a routerLink="/favorites">Favoritos</a> -->
-    <a routerLink="/players">Jugadores</a>
-    <a routerLink="/teams">Equipos</a>
-    <a routerLink="/matches">Partidos</a>
-    <span>
+
+    <a routerLink="/players" style="color:white;">
+        Jugadores
+    </a>
+
+    <a routerLink="/teams" style="color:white;">
+        Equipos
+    </a>
+
+    <a routerLink="/matches" style="color:white;">
+        Partidos
+    </a>
+
+    <a routerLink="/lineups" style="color:white;">
+        Alineaciones
+    </a>
+
+    <a routerLink="/lineup-details" style="color:white;">
+        Detalles
+    </a>
+
+    <a routerLink="/stats" style="color:white;">
+        Estadisticas
+    </a>
+
+    <span style="margin-left:auto;">
         {{ auth.getUser()?.username }}
     </span>
-    }
 
-    @if (auth.isLoggedIn()) {
-    <button (click)="logout()">Logout</button>
+    <button (click)="logout()">
+        Logout
+    </button>
+
     }
 
 </nav>

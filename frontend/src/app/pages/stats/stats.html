@@ -1,0 +1,89 @@
+<h2>Stats</h2>
+
+<form (ngSubmit)="createStat()">
+
+    <select [(ngModel)]="newStat.player_id" name="player_id">
+
+        <option [ngValue]="null">
+            Jugador
+        </option>
+
+        @for (player of players; track player.id) {
+
+        <option [ngValue]="player.id">
+            {{ player.name }}
+        </option>
+
+        }
+
+    </select>
+
+    <select [(ngModel)]="newStat.match_id" name="match_id">
+
+        <option [ngValue]="null">
+            Partido
+        </option>
+
+        @for (match of matches; track match.id) {
+
+        <option [ngValue]="match.id">
+            {{ match.home_team_name }}
+            vs
+            {{ match.away_team_name }}
+        </option>
+
+        }
+
+    </select>
+
+    <input type="number" [(ngModel)]="newStat.points" name="points" placeholder="PTS">
+
+    <input type="number" [(ngModel)]="newStat.rebounds" name="rebounds" placeholder="REB">
+
+    <input type="number" [(ngModel)]="newStat.assists" name="assists" placeholder="AST">
+
+    <button type="submit">
+        Guardar
+    </button>
+
+</form>
+
+<hr>
+
+<ul>
+
+    @for (stat of stats; track stat.id) {
+
+    <li>
+
+        <strong>
+            {{ stat.player_name }}
+        </strong>
+
+        -
+
+        {{ stat.home_team }}
+        vs
+        {{ stat.away_team }}
+
+        |
+
+        {{ stat.points }} PTS
+
+        {{ stat.rebounds }} REB
+
+        {{ stat.assists }} AST
+
+        <button (click)="editStat(stat)">
+            Editar
+        </button>
+
+        <button (click)="deleteStat(stat.id)">
+            Eliminar
+        </button>
+
+    </li>
+
+    }
+
+</ul>
