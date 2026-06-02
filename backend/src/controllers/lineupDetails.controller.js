@@ -1,77 +1,51 @@
 const db = require('../config/db');
 
-exports.getLineupDetails = (req, res) => {
+exports.getLineupDetails = async (req, res) => {
+    try {
+        const [results] = await db.query(`
+            SELECT
+                ld.id,
+                ld.lineup_id,
+                p.id AS player_id,
+                p.name AS player_name,
+                p.position,
+                t.name AS team_name,
+                l.name AS lineup_name
+            FROM lineup_details ld
+            JOIN players p ON ld.player_id = p.id
+            LEFT JOIN teams t ON p.team_id = t.id
+            JOIN lineups l ON ld.lineup_id = l.id
+        `);
 
-    db.query(`
-        SELECT 
-            lineup_details.id,
-            lineup_details.lineup_id,
-
-            players.id AS player_id,
-            players.name AS player_name,
-            players.position,
-
-            teams.name AS team_name,
-
-            lineups.name AS lineup_name
-
-        FROM lineup_details
-
-        JOIN players
-            ON lineup_details.player_id = players.id
-
-        LEFT JOIN teams
-            ON players.team_id = teams.id
-
-        JOIN lineups
-            ON lineup_details.lineup_id = lineups.id
-    `,
-        (err, results) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json(results);
-        });
+        res.json(results);
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.createLineupDetail = (req, res) => {
+exports.createLineupDetail = async (req, res) => {
+    try {
+        const { lineup_id, player_id } = req.body;
 
-    const { lineup_id, player_id } = req.body;
+        await db.query(
+            'INSERT INTO lineup_details (lineup_id, player_id) VALUES (?, ?)',
+            [lineup_id, player_id]
+        );
 
-    db.query(
-        `
-        INSERT INTO lineup_details
-        (lineup_id, player_id)
-        VALUES (?, ?)
-        `,
-        [lineup_id, player_id],
-
-        (err, result) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json({
-                message: 'Jugador agregado a alineación'
-            });
-        }
-    );
+        res.json({ message: 'Jugador agregado a lineup' });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.deleteLineupDetail = (req, res) => {
+exports.deleteLineupDetail = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-    const { id } = req.params;
+        await db.query('DELETE FROM lineup_details WHERE id=?', [id]);
 
-    db.query(
-        'DELETE FROM lineup_details WHERE id=?',
-        [id],
-
-        (err, result) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json({
-                message: 'Jugador eliminado de alineación'
-            });
-        }
-    );
+        res.json({ message: 'Eliminado del lineup' });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };

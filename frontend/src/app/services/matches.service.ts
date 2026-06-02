@@ -6,7 +6,7 @@ import { environment } from '../../environmets/environment';
 @Injectable({ providedIn: 'root' })
 export class MatchesService {
 
-  private api = `${environment.apiUrl}`;
+  private api = `${environment.apiUrl}/matches`;
 
 
   constructor(private http: HttpClient) { }
@@ -25,5 +25,8 @@ export class MatchesService {
 
   deleteMatch(id: number) {
     return this.http.delete(`${this.api}/${id}`);
+  }
+  getMatchById(id: any) {
+    return this.http.get<any>(`${this.api}/${id}`);
   }
 }

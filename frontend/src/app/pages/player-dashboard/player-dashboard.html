@@ -1,0 +1,130 @@
+<h2>Player Analytics Dashboard</h2>
+
+<!-- SELECTOR -->
+<div>
+    <label>Seleccionar jugador:</label>
+
+    <select [(ngModel)]="selectedPlayerId" (ngModelChange)="loadPlayerAnalytics()">
+        <option [ngValue]="null">-- Jugador --</option>
+
+        @for (p of players; track p.id) {
+        <option [ngValue]="p.id">
+            {{ p.name }}
+        </option>
+        }
+    </select>
+</div>
+
+<hr>
+
+<!-- DASHBOARD -->
+@if (selectedAnalytics) {
+
+<!-- PLAYER INFO -->
+<h3>{{ selectedAnalytics?.player?.name || 'Jugador' }}</h3>
+
+<p><strong>Equipo:</strong> {{ selectedAnalytics?.player?.team_name || 'N/A' }}</p>
+<p><strong>Posición:</strong> {{ selectedAnalytics?.player?.position || 'N/A' }}</p>
+
+<hr>
+
+<!-- IMPACT SCORE -->
+<div>
+    <h3>Impact Score</h3>
+
+    <h1>
+        {{ (selectedAnalytics?.impact?.impact_score ) }}
+    </h1>
+
+</div>
+
+<hr>
+
+<!-- STYLES -->
+<div>
+    <h3>Player Styles</h3>
+
+    @for (style of (selectedAnalytics?.styles?.styles || []); track style) {
+    <span>
+        {{ style }}
+    </span>
+    }
+</div>
+
+<hr>
+
+<!-- STATS -->
+<div>
+    <h3>Stats</h3>
+
+    <ul>
+        <li>Points: {{ selectedAnalytics?.stats?.points || 0 }}</li>
+        <li>Rebounds: {{ selectedAnalytics?.stats?.rebounds || 0 }}</li>
+        <li>Assists: {{ selectedAnalytics?.stats?.assists || 0 }}</li>
+        <li>Steals: {{ selectedAnalytics?.stats?.steals || 0 }}</li>
+        <li>Blocks: {{ selectedAnalytics?.stats?.blocks || 0 }}</li>
+        <li>Turnovers: {{ selectedAnalytics?.stats?.turnovers || 0 }}</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- SHOOTING -->
+<div>
+    <h3>Shooting</h3>
+
+    <p>
+        FG%:
+        {{ selectedAnalytics?.impact?.breakdown?.shooting?.fg_pct || 0 }}
+    </p>
+
+    <p>
+        3P%:
+        {{ selectedAnalytics?.impact?.breakdown?.shooting?.three_pct || 0 }}
+    </p>
+</div>
+
+<hr>
+
+<!-- PERCENTILES -->
+<div>
+    <h3>League Percentiles</h3>
+
+    <ul>
+        <li>
+            Points:
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.points * 100) | number:'1.0-0' }}%
+        </li>
+
+        <li>
+            Rebounds:
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.rebounds * 100) | number:'1.0-0' }}%
+        </li>
+
+        <li>
+            Assists:
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.assists * 100) | number:'1.0-0' }}%
+        </li>
+
+        <li>
+            Steals:
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.steals * 100) | number:'1.0-0' }}%
+        </li>
+
+        <li>
+            Blocks:
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.blocks * 100) | number:'1.0-0' }}%
+        </li>
+
+        <li>
+            Turnovers:
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.turnovers * 100) | number:'1.0-0' }}%
+        </li>
+    </ul>
+</div>
+
+}
+
+@else {
+<p>Selecciona un jugador para ver el análisis</p>
+}

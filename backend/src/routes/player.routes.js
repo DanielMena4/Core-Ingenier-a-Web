@@ -4,9 +4,9 @@ const controller = require('../controllers/player.controller');
 
 
 
-router.get('/players', controller.getPlayers);
-router.post('/players',controller.createPlayer);
-router.put('/players/:id', controller.updatePlayer);
-router.delete('/players/:id', controller.deletePlayer);
+router.get('/', controller.getPlayers);
+router.post('/',controller.createPlayer);
+router.put('/:id', controller.updatePlayer);
+router.delete('/:id', controller.deletePlayer);
 
 module.exports = router;

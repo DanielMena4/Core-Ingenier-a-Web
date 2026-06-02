@@ -8,7 +8,7 @@ import { environment } from '../../environmets/environment';
 })
 export class StatsService {
 
-  private api = `${environment.apiUrl}`;
+  private api = `${environment.apiUrl}/stats`;
 
 
   constructor(private http: HttpClient) { }
@@ -27,5 +27,8 @@ export class StatsService {
 
   deleteStat(id: number) {
     return this.http.delete(`${this.api}/${id}`);
+  }
+  getStatsByMatch(id: any) {
+    return this.http.get<any[]>(`${this.api}/match/${id}`);
   }
 }

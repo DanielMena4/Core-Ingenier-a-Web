@@ -50,6 +50,10 @@
         <button (click)="updateMatch()">Guardar</button>
         }
         <button (click)="deleteMatch(match.id)">Eliminar</button>
+        
+        <a [routerLink]="['/matches', match.id]">
+            Ver detalle
+        </a>
     </li>
     }
 </ul>

@@ -1,33 +1,30 @@
 <h2>Jugadores</h2>
 
+
 <form (ngSubmit)="createPlayer()">
+
     <input [(ngModel)]="newPlayer.name" name="name" placeholder="Nombre">
 
     <select [(ngModel)]="newPlayer.team_id" name="team_id">
         <option [ngValue]="null">Seleccionar equipo</option>
 
         @for (team of teams; track team.id) {
-        <option [ngValue]="+team.id">
+        <option [ngValue]="team.id">
             {{ team.name }}
         </option>
         }
     </select>
 
     <select [(ngModel)]="newPlayer.position" name="position">
-
-        <option value="">
-            Seleccionar posición
-        </option>
+        <option value="">Seleccionar posición</option>
 
         @for (position of positions; track position) {
-
         <option [value]="position">
             {{ position }}
         </option>
-
         }
-
     </select>
+
     <input type="number" [(ngModel)]="newPlayer.age" name="age" placeholder="Edad">
 
     <button type="submit">Crear</button>
@@ -35,55 +32,56 @@
 
 <hr>
 
+<!-- EDIT PLAYER -->
 @if (editingPlayer) {
+
 <h3>Editar jugador</h3>
 
-<input [(ngModel)]="editingPlayer.name" placeholder="Nombre">
+<input [(ngModel)]="editingPlayer.name" name="edit_name" placeholder="Nombre">
 
-
-<select [(ngModel)]="editingPlayer.team_id" name="team_id">
+<select [(ngModel)]="editingPlayer.team_id" name="edit_team">
     <option [ngValue]="null">Seleccionar equipo</option>
 
     @for (team of teams; track team.id) {
-    <option [ngValue]="+team.id">
+    <option [ngValue]="team.id">
         {{ team.name }}
     </option>
     }
 </select>
-<select [(ngModel)]="editingPlayer.position" name="position">
 
-    <option value="">
-        Seleccionar posición
-    </option>
+<select [(ngModel)]="editingPlayer.position" name="edit_position">
+    <option value="">Seleccionar posición</option>
 
     @for (position of positions; track position) {
-
     <option [value]="position">
         {{ position }}
     </option>
-
     }
-
 </select>
 
-<input type="number" [(ngModel)]="editingPlayer.age" name="age" placeholder="Edad">
+<input type="number" [(ngModel)]="editingPlayer.age" name="edit_age" placeholder="Edad">
 
 <button (click)="updatePlayer()">Guardar</button>
 }
 
+<hr>
+
+<!-- LIST -->
 @if (players.length > 0) {
 <ul>
     @for (player of players; track player.id) {
     <li>
-
-        {{ player.name }} - {{ player.team_name }} - {{ player.position }} - {{player.age}}
+        <strong>{{ player.name }}</strong>
+        - {{ player.team_name }}
+        - {{ player.position }}
+        - {{ player.age }}
 
         <button (click)="editPlayer(player)">Editar</button>
         <button (click)="deletePlayer(player.id)">Eliminar</button>
-
     </li>
     }
 </ul>
-} @else {
-<p>Cargando jugadores...</p>
+}
+@else {
+<p>No hay jugadores cargados...</p>
 }

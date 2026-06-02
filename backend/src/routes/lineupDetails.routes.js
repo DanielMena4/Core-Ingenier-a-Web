@@ -3,10 +3,10 @@ const router = express.Router();
 
 const controller = require('../controllers/lineupDetails.controller');
 
-router.get('/lineup-details', controller.getLineupDetails);
+router.get('/', controller.getLineupDetails);
 
-router.post('/lineup-details', controller.createLineupDetail);
+router.post('/', controller.createLineupDetail);
 
-router.delete('/lineup-details/:id', controller.deleteLineupDetail);
+router.delete('/:id', controller.deleteLineupDetail);
 
 module.exports = router;

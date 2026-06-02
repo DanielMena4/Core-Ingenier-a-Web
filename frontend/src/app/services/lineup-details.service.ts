@@ -8,7 +8,7 @@ import { environment } from '../../environmets/environment';
 })
 export class LineupDetailsService {
 
-  private api = `${environment.apiUrl}`;
+  private api = `${environment.apiUrl}/lineup-details`;
 
   constructor(private http: HttpClient) { }
 

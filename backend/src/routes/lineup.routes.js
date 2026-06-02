@@ -3,12 +3,12 @@ const router = express.Router();
 
 const controller = require('../controllers/lineup.controller');
 
-router.get('/lineups', controller.getLineups);
+router.get('/', controller.getLineups);
 
-router.post('/lineups', controller.createLineup);
+router.post('/', controller.createLineup);
 
-router.put('/lineups/:id', controller.updateLineup);
+router.put('/:id', controller.updateLineup);
 
-router.delete('/lineups/:id', controller.deleteLineup);
+router.delete('/:id', controller.deleteLineup);
 
 module.exports = router;

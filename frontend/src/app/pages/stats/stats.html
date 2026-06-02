@@ -2,7 +2,9 @@
 
 <form (ngSubmit)="createStat()">
 
-    <select [(ngModel)]="newStat.player_id" name="player_id">
+    <!-- PLAYER -->
+
+    <select [(ngModel)]="newStat.player_id" name="player_id" required>
 
         <option [ngValue]="null">
             Jugador
@@ -18,7 +20,9 @@
 
     </select>
 
-    <select [(ngModel)]="newStat.match_id" name="match_id">
+    <!-- MATCH -->
+
+    <select [(ngModel)]="newStat.match_id" name="match_id" required>
 
         <option [ngValue]="null">
             Partido
@@ -27,20 +31,64 @@
         @for (match of matches; track match.id) {
 
         <option [ngValue]="match.id">
+
             {{ match.home_team_name }}
             vs
             {{ match.away_team_name }}
+
         </option>
 
         }
 
     </select>
 
-    <input type="number" [(ngModel)]="newStat.points" name="points" placeholder="PTS">
+    <hr>
 
-    <input type="number" [(ngModel)]="newStat.rebounds" name="rebounds" placeholder="REB">
+    <!-- BASIC STATS -->
 
-    <input type="number" [(ngModel)]="newStat.assists" name="assists" placeholder="AST">
+    <input type="number" min="0" [(ngModel)]="newStat.points" name="points" placeholder="PTS" required>
+
+    <input type="number" min="0" [(ngModel)]="newStat.rebounds" name="rebounds" placeholder="REB" required>
+
+    <input type="number" min="0" [(ngModel)]="newStat.assists" name="assists" placeholder="AST" required>
+
+    <input type="number" min="0" [(ngModel)]="newStat.blocks" name="blocks" placeholder="BLK">
+
+    <input type="number" min="0" [(ngModel)]="newStat.steals" name="steals" placeholder="STL">
+
+    <input type="number" min="0" [(ngModel)]="newStat.turnovers" name="turnovers" placeholder="TOV">
+
+    <input type="number" min="0" max="60" [(ngModel)]="newStat.minutes" name="minutes" placeholder="MIN">
+
+    <input type="number" min="0" max="6" [(ngModel)]="newStat.fouls" name="fouls" placeholder="PF">
+
+    <hr>
+
+    <!-- FIELD GOALS -->
+
+    <input type="number" min="0" [(ngModel)]="newStat.field_goals_attempted" name="field_goals_attempted"
+        placeholder="FGA">
+
+    <input type="number" min="0" [(ngModel)]="newStat.field_goals_made" name="field_goals_made" placeholder="FGM">
+
+    <!-- THREES -->
+
+    <input type="number" min="0" [(ngModel)]="newStat.threes_attempted" name="threes_attempted" placeholder="3PA">
+
+    <input type="number" min="0" [(ngModel)]="newStat.threes_made" name="threes_made" placeholder="3PM">
+
+    <!-- FREE THROWS -->
+
+    <input type="number" min="0" [(ngModel)]="newStat.free_throws_attempted" name="free_throws_attempted"
+        placeholder="FTA">
+
+    <input type="number" min="0" [(ngModel)]="newStat.free_throws_made" name="free_throws_made" placeholder="FTM">
+
+    <hr>
+
+    <!-- PLUS MINUS -->
+
+    <input type="number" [(ngModel)]="newStat.plus_minus" name="plus_minus" placeholder="+/-">
 
     <button type="submit">
         Guardar
@@ -73,6 +121,18 @@
         {{ stat.rebounds }} REB
 
         {{ stat.assists }} AST
+
+        |
+
+        {{ stat.field_goals_made }}/{{ stat.field_goals_attempted }} FG
+
+        |
+
+        {{ stat.threes_made }}/{{ stat.threes_attempted }} 3PT
+
+        |
+
+        {{ stat.free_throws_made }}/{{ stat.free_throws_attempted }} FT
 
         <button (click)="editStat(stat)">
             Editar

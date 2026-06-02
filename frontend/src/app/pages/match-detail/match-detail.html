@@ -1,0 +1,138 @@
+@if (match) {
+
+<h2>
+    {{ match.home_team }} vs {{ match.away_team }}
+</h2>
+
+<p>
+    {{ match.match_date }}
+</p>
+
+<hr>
+
+<h3>Boxscore</h3>
+
+<table border="1" width="100%">
+    <thead>
+        <tr>
+            <th>Jugador</th>
+            <th>Equipo</th>
+
+            <th>PTS</th>
+            <th>REB</th>
+            <th>AST</th>
+
+            <th>MIN</th>
+            <th>STL</th>
+            <th>BLK</th>
+            <th>TOV</th>
+
+            <th>FG</th>
+            <th>3PT</th>
+            <th>FT</th>
+
+            <th>+/-</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @for (stat of stats; track stat.id) {
+        <tr>
+            <td>{{ stat.player_name }}</td>
+            <td>{{ stat.team_name }}</td>
+
+            <td>{{ stat.points ?? 0 }}</td>
+            <td>{{ stat.rebounds ?? 0 }}</td>
+            <td>{{ stat.assists ?? 0 }}</td>
+
+            <td>{{ stat.minutes ?? 0 }}</td>
+            <td>{{ stat.steals ?? 0 }}</td>
+            <td>{{ stat.blocks ?? 0 }}</td>
+            <td>{{ stat.turnovers ?? 0 }}</td>
+
+            <td>
+                {{ stat.field_goals_made ?? 0 }}/{{ stat.field_goals_attempted ?? 0 }}
+            </td>
+
+            <td>
+                {{ stat.threes_made ?? 0 }}/{{ stat.threes_attempted ?? 0 }}
+            </td>
+
+            <td>
+                {{ stat.free_throws_made ?? 0 }}/{{ stat.free_throws_attempted ?? 0 }}
+            </td>
+
+            <td>
+                {{ stat.plus_minus ?? 0 }}
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<hr>
+
+<h3>Agregar Estadística</h3>
+
+<form (ngSubmit)="createStat()">
+
+    <!-- PLAYER -->
+    <select [(ngModel)]="newStat.player_id" name="player_id">
+        <option [ngValue]="null">Jugador</option>
+
+        @for (player of filteredPlayers; track player.id) {
+        <option [ngValue]="player.id">
+            {{ player.name }}
+        </option>
+        }
+    </select>
+
+    <hr>
+
+    <!-- BASIC -->
+    <input type="number" min="0" [(ngModel)]="newStat.points" name="points" placeholder="PTS">
+    <input type="number" min="0" [(ngModel)]="newStat.rebounds" name="rebounds" placeholder="REB">
+    <input type="number" min="0" [(ngModel)]="newStat.assists" name="assists" placeholder="AST">
+
+    <hr>
+
+    <!-- ADVANCED -->
+    <input type="number" min="0" [(ngModel)]="newStat.minutes" name="minutes" placeholder="MIN">
+
+    <input type="number" min="0" [(ngModel)]="newStat.steals" name="steals" placeholder="STL">
+    <input type="number" min="0" [(ngModel)]="newStat.blocks" name="blocks" placeholder="BLK">
+    <input type="number" min="0" [(ngModel)]="newStat.turnovers" name="turnovers" placeholder="TOV">
+
+    <hr>
+
+    <!-- FG -->
+    <h4>Field Goals</h4>
+    <input type="number" min="0" [(ngModel)]="newStat.field_goals_made" name="fgm" placeholder="FGM">
+    <input type="number" min="0" [(ngModel)]="newStat.field_goals_attempted" name="fga" placeholder="FGA">
+
+    <!-- 3PT -->
+    <input type="number" min="0" [(ngModel)]="newStat.threes_made" name="3pm" placeholder="3PM">
+    <input type="number" min="0" [(ngModel)]="newStat.threes_attempted" name="3pa" placeholder="3PA">
+
+    <!-- FT -->
+    <input type="number" min="0" [(ngModel)]="newStat.free_throws_made" name="ftm" placeholder="FTM">
+    <input type="number" min="0" [(ngModel)]="newStat.free_throws_attempted" name="fta" placeholder="FTA">
+
+    <hr>
+
+    <!-- PLUS MINUS -->
+    <input type="number" [(ngModel)]="newStat.plus_minus" name="plus_minus" placeholder="+/-">
+
+    <hr>
+
+    <button type="submit">
+        Guardar
+    </button>
+
+</form>
+
+} @else {
+
+<p>Cargando partido...</p>
+
+}

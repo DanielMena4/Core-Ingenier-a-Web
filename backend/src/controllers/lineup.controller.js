@@ -1,73 +1,58 @@
 const db = require('../config/db');
 
-exports.getLineups = (req, res) => {
-
-    db.query(`
-        SELECT 
-            lineups.*,
-            teams.name AS team_name
-        FROM lineups
-        JOIN teams ON lineups.team_id = teams.id
-    `, (err, results) => {
-
-        if (err) return res.status(500).json(err);
+exports.getLineups = async (req, res) => {
+    try {
+        const [results] = await db.query(`
+            SELECT lineups.*, teams.name AS team_name
+            FROM lineups
+            JOIN teams ON lineups.team_id = teams.id
+        `);
 
         res.json(results);
-    });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.createLineup = (req, res) => {
+exports.createLineup = async (req, res) => {
+    try {
+        const { name, team_id } = req.body;
 
-    const { name, team_id } = req.body;
+        await db.query(
+            'INSERT INTO lineups (name, team_id) VALUES (?, ?)',
+            [name, team_id]
+        );
 
-    db.query(
-        'INSERT INTO lineups (name, team_id) VALUES (?, ?)',
-        [name, team_id],
-        (err, result) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json({
-                message: 'Alineación creada'
-            });
-        }
-    );
+        res.json({ message: 'Lineup creado' });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.updateLineup = (req, res) => {
+exports.updateLineup = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, team_id } = req.body;
 
-    const { id } = req.params;
+        await db.query(
+            'UPDATE lineups SET name=?, team_id=? WHERE id=?',
+            [name, team_id, id]
+        );
 
-    const { name, team_id } = req.body;
-
-    db.query(
-        'UPDATE lineups SET name=?, team_id=? WHERE id=?',
-        [name, team_id, id],
-        (err, result) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json({
-                message: 'Alineación actualizada'
-            });
-        }
-    );
+        res.json({ message: 'Lineup actualizado' });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.deleteLineup = (req, res) => {
+exports.deleteLineup = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-    const { id } = req.params;
+        await db.query('DELETE FROM lineups WHERE id=?', [id]);
 
-    db.query(
-        'DELETE FROM lineups WHERE id=?',
-        [id],
-        (err, result) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json({
-                message: 'Alineación eliminada'
-            });
-        }
-    );
+        res.json({ message: 'Lineup eliminado' });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };

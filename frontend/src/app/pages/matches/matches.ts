@@ -3,10 +3,11 @@ import { MatchesService } from '../../services/matches.service';
 import { TeamService } from '../../services/team.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './matches.html'
 })
 export class Matches implements OnInit {

@@ -1,65 +1,33 @@
 const db = require('../config/db');
 
-exports.getStats = (req, res) => {
+exports.getStats = async (req, res) => {
+    try {
+        const [results] = await db.query(`
+            SELECT
+                stats.*,
+                players.name AS player_name,
+                home.name AS home_team,
+                away.name AS away_team
+            FROM stats
+            JOIN players ON stats.player_id = players.id
+            JOIN matches ON stats.match_id = matches.id
+            JOIN teams home ON matches.home_team_id = home.id
+            JOIN teams away ON matches.away_team_id = away.id
+        `);
 
-    db.query(`
-        SELECT
+        res.json(results);
 
-            stats.*,
-
-            players.name AS player_name,
-
-            home.name AS home_team,
-            away.name AS away_team
-
-        FROM stats
-
-        JOIN players
-            ON stats.player_id = players.id
-
-        JOIN matches
-            ON stats.match_id = matches.id
-
-        JOIN teams home
-            ON matches.home_team_id = home.id
-
-        JOIN teams away
-            ON matches.away_team_id = away.id
-    `,
-        (err, results) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json(results);
-        });
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.createStat = (req, res) => {
-
-    const {
-        points,
-        rebounds,
-        assists,
-        blocks,
-        steals,
-        turnovers,
-        minutes,
-        fouls,
-        field_goals_attempted,
-        field_goals_made,
-        threes_attempted,
-        threes_made,
-        free_throws_attempted,
-        free_throws_made,
-        plus_minus,
-        player_id,
-        match_id
-    } = req.body;
-
-    db.query(
-        `
-        INSERT INTO stats (
-
+/**
+ * CREATE STAT (con validación de duplicados)
+ */
+exports.createStat = async (req, res) => {
+    try {
+        const {
             points,
             rebounds,
             assists,
@@ -77,12 +45,80 @@ exports.createStat = (req, res) => {
             plus_minus,
             player_id,
             match_id
+        } = req.body;
 
-        )
+        // 🔥 VALIDAR DUPLICADO
+        const [existing] = await db.query(
+            `SELECT id FROM stats WHERE player_id = ? AND match_id = ?`,
+            [player_id, match_id]
+        );
 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `,
-        [
+        if (existing.length > 0) {
+            return res.status(400).json({
+                message: 'Este jugador ya tiene estadísticas en este partido'
+            });
+        }
+
+        // 🔥 INSERT
+        await db.query(
+            `
+            INSERT INTO stats (
+                points,
+                rebounds,
+                assists,
+                blocks,
+                steals,
+                turnovers,
+                minutes,
+                fouls,
+                field_goals_attempted,
+                field_goals_made,
+                threes_attempted,
+                threes_made,
+                free_throws_attempted,
+                free_throws_made,
+                plus_minus,
+                player_id,
+                match_id
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `,
+            [
+                points,
+                rebounds,
+                assists,
+                blocks,
+                steals,
+                turnovers,
+                minutes,
+                fouls,
+                field_goals_attempted,
+                field_goals_made,
+                threes_attempted,
+                threes_made,
+                free_throws_attempted,
+                free_throws_made,
+                plus_minus,
+                player_id,
+                match_id
+            ]
+        );
+
+        res.json({ message: 'Stats creadas' });
+
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
+/**
+ * UPDATE STAT
+ */
+exports.updateStat = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const {
             points,
             rebounds,
             assists,
@@ -96,57 +132,93 @@ exports.createStat = (req, res) => {
             threes_attempted,
             threes_made,
             free_throws_attempted,
-            free_throws_made,
-            plus_minus,
-            player_id,
-            match_id
-        ],
+            free_throws_made
+        } = req.body;
 
-        (err, result) => {
+        // VALIDACIONES
+        const stats = [
+            points,
+            rebounds,
+            assists,
+            blocks,
+            steals,
+            turnovers,
+            minutes,
+            fouls,
+            field_goals_attempted,
+            field_goals_made,
+            threes_attempted,
+            threes_made,
+            free_throws_attempted,
+            free_throws_made
+        ];
 
-            if (err) return res.status(500).json(err);
+        for (const stat of stats) {
+            if (stat < 0) {
+                return res.status(400).json({
+                    message: 'Las estadísticas no pueden ser negativas'
+                });
+            }
+        }
 
-            res.json({
-                message: 'Stats creadas'
+        if (field_goals_made > field_goals_attempted) {
+            return res.status(400).json({
+                message: 'FGM no puede ser mayor que FGA'
             });
         }
-    );
+
+        await db.query(
+            `UPDATE stats SET ? WHERE id = ?`,
+            [req.body, id]
+        );
+
+        res.json({ message: 'Stats actualizadas' });
+
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.updateStat = (req, res) => {
+/**
+ * DELETE STAT
+ */
+exports.deleteStat = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-    const { id } = req.params;
+        await db.query(
+            `DELETE FROM stats WHERE id = ?`,
+            [id]
+        );
 
-    db.query(
-        'UPDATE stats SET ? WHERE id=?',
-        [req.body, id],
+        res.json({ message: 'Stats eliminadas' });
 
-        (err, result) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json({
-                message: 'Stats actualizadas'
-            });
-        }
-    );
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };
 
-exports.deleteStat = (req, res) => {
+/**
+ * GET STATS BY MATCH
+ */
+exports.getStatsByMatch = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-    const { id } = req.params;
+        const [results] = await db.query(`
+            SELECT
+                stats.*,
+                players.name AS player_name,
+                teams.name AS team_name
+            FROM stats
+            JOIN players ON stats.player_id = players.id
+            LEFT JOIN teams ON players.team_id = teams.id
+            WHERE stats.match_id = ?
+        `, [id]);
 
-    db.query(
-        'DELETE FROM stats WHERE id=?',
-        [id],
+        res.json(results);
 
-        (err, result) => {
-
-            if (err) return res.status(500).json(err);
-
-            res.json({
-                message: 'Stats eliminadas'
-            });
-        }
-    );
+    } catch (err) {
+        res.status(500).json(err);
+    }
 };

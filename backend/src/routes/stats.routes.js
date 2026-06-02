@@ -3,12 +3,14 @@ const router = express.Router();
 
 const controller = require('../controllers/stats.controller');
 
-router.get('/stats', controller.getStats);
+router.get('/', controller.getStats);
 
-router.post('/stats', controller.createStat);
+router.post('/', controller.createStat);
 
-router.put('/stats/:id', controller.updateStat);
+router.put('/:id', controller.updateStat);
 
-router.delete('/stats/:id', controller.deleteStat);
+router.delete('/:id', controller.deleteStat);
+
+router.get('/match/:id', controller.getStatsByMatch);
 
 module.exports = router;
