@@ -1,87 +1,170 @@
 <h2>Jugadores</h2>
 
+@for (team of groupedPlayers | keyvalue; track team.key) {
+
+<div class="team-section">
+
+    <h3>{{ team.key }}</h3>
+
+    <table class="players-table">
+
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Posición</th>
+                <th>Edad</th>
+
+
+                @if (auth.isAdmin()) {
+                <th>Acciones</th>
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @for (player of team.value; track player.id) {
+
+            <tr>
+
+                <td>{{ player.name }}</td>
+
+                <td>{{ player.position }}</td>
+
+                <td>{{ player.age }}</td>
+
+                <td>
+
+                    <button (click)="viewPlayer(player.id)">
+                        Ver detalle
+                    </button>
+
+                </td>
+
+                @if (auth.isAdmin()) {
+
+                <td>
+
+                    <button (click)="editPlayer(player)">
+                        Editar
+                    </button>
+
+                    <button (click)="deletePlayer(player.id)">
+                        Eliminar
+                    </button>
+
+                </td>
+
+                }
+
+            </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+}
+
+@if (auth.isAdmin()) {
+
+<hr>
+
+<h2>Crear Jugador</h2>
 
 <form (ngSubmit)="createPlayer()">
 
-    <input [(ngModel)]="newPlayer.name" name="name" placeholder="Nombre">
+    <input type="text" name="name" placeholder="Nombre" [(ngModel)]="newPlayer.name">
 
-    <select [(ngModel)]="newPlayer.team_id" name="team_id">
-        <option [ngValue]="null">Seleccionar equipo</option>
+    <select name="team_id" [(ngModel)]="newPlayer.team_id">
+
+        <option [ngValue]="null">
+            Equipo
+        </option>
 
         @for (team of teams; track team.id) {
+
         <option [ngValue]="team.id">
             {{ team.name }}
         </option>
+
         }
+
     </select>
 
-    <select [(ngModel)]="newPlayer.position" name="position">
-        <option value="">Seleccionar posición</option>
+    <select name="position" [(ngModel)]="newPlayer.position">
+
+        <option value="">
+            Posición
+        </option>
 
         @for (position of positions; track position) {
+
         <option [value]="position">
             {{ position }}
         </option>
+
         }
+
     </select>
 
-    <input type="number" [(ngModel)]="newPlayer.age" name="age" placeholder="Edad">
+    <input type="number" name="age" placeholder="Edad" [(ngModel)]="newPlayer.age">
 
-    <button type="submit">Crear</button>
+    <button type="submit">
+        Crear Jugador
+    </button>
+
 </form>
 
-<hr>
-
-<!-- EDIT PLAYER -->
-@if (editingPlayer) {
-
-<h3>Editar jugador</h3>
-
-<input [(ngModel)]="editingPlayer.name" name="edit_name" placeholder="Nombre">
-
-<select [(ngModel)]="editingPlayer.team_id" name="edit_team">
-    <option [ngValue]="null">Seleccionar equipo</option>
-
-    @for (team of teams; track team.id) {
-    <option [ngValue]="team.id">
-        {{ team.name }}
-    </option>
-    }
-</select>
-
-<select [(ngModel)]="editingPlayer.position" name="edit_position">
-    <option value="">Seleccionar posición</option>
-
-    @for (position of positions; track position) {
-    <option [value]="position">
-        {{ position }}
-    </option>
-    }
-</select>
-
-<input type="number" [(ngModel)]="editingPlayer.age" name="edit_age" placeholder="Edad">
-
-<button (click)="updatePlayer()">Guardar</button>
 }
+
+@if (editingPlayer && auth.isAdmin()) {
 
 <hr>
 
-<!-- LIST -->
-@if (players.length > 0) {
-<ul>
-    @for (player of players; track player.id) {
-    <li>
-        <strong>{{ player.name }}</strong>
-        - {{ player.team_name }}
-        - {{ player.position }}
-        - {{ player.age }}
+<h2>Editar Jugador</h2>
 
-        <button (click)="editPlayer(player)">Editar</button>
-        <button (click)="deletePlayer(player.id)">Eliminar</button>
-    </li>
-    }
-</ul>
-}
-@else {
-<p>No hay jugadores cargados...</p>
+<form (ngSubmit)="updatePlayer()">
+
+    <input type="text" name="editName" [(ngModel)]="editingPlayer.name">
+
+    <select name="editTeam" [(ngModel)]="editingPlayer.team_id">
+
+        @for (team of teams; track team.id) {
+
+        <option [ngValue]="team.id">
+            {{ team.name }}
+        </option>
+
+        }
+
+    </select>
+
+    <select name="editPosition" [(ngModel)]="editingPlayer.position">
+
+        @for (position of positions; track position) {
+
+        <option [value]="position">
+            {{ position }}
+        </option>
+
+        }
+
+    </select>
+
+    <input type="number" name="editAge" [(ngModel)]="editingPlayer.age">
+
+    <button type="submit">
+        Guardar
+    </button>
+
+    <button type="button" (click)="editingPlayer = null">
+        Cancelar
+    </button>
+
+</form>
+
 }

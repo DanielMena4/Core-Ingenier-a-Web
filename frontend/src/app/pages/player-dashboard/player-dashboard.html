@@ -4,14 +4,22 @@
 <div>
     <label>Seleccionar jugador:</label>
 
-    <select [(ngModel)]="selectedPlayerId" (ngModelChange)="loadPlayerAnalytics()">
-        <option [ngValue]="null">-- Jugador --</option>
+    <select [(ngModel)]="selectedPlayerId" (change)="loadPlayerAnalytics()">
 
-        @for (p of players; track p.id) {
-        <option [ngValue]="p.id">
-            {{ p.name }}
+        <option [ngValue]="null">
+            Seleccione un jugador
         </option>
+
+        @for (player of players; track player.id) {
+
+        <option [ngValue]="player.id">
+
+            {{ player.name }}
+
+        </option>
+
         }
+
     </select>
 </div>
 
@@ -44,7 +52,7 @@
 <div>
     <h3>Player Styles</h3>
 
-    @for (style of (selectedAnalytics?.styles?.styles || []); track style) {
+    @for (style of (selectedAnalytics?.styles || []); track style) {
     <span>
         {{ style }}
     </span>
@@ -58,31 +66,29 @@
     <h3>Stats</h3>
 
     <ul>
-        <li>Points: {{ selectedAnalytics?.stats?.points || 0 }}</li>
-        <li>Rebounds: {{ selectedAnalytics?.stats?.rebounds || 0 }}</li>
-        <li>Assists: {{ selectedAnalytics?.stats?.assists || 0 }}</li>
-        <li>Steals: {{ selectedAnalytics?.stats?.steals || 0 }}</li>
-        <li>Blocks: {{ selectedAnalytics?.stats?.blocks || 0 }}</li>
-        <li>Turnovers: {{ selectedAnalytics?.stats?.turnovers || 0 }}</li>
+        <li>Points: {{ selectedAnalytics?.stats?.points || 0 | number:'1.2-2'}}</li>
+        <li>Rebounds: {{ selectedAnalytics?.stats?.rebounds || 0 | number:'1.2-2'}}</li>
+        <li>Assists: {{ selectedAnalytics?.stats?.assists || 0 | number:'1.2-2'}}</li>
+        <li>Steals: {{ selectedAnalytics?.stats?.steals || 0 | number:'1.2-2'}}</li>
+        <li>Blocks: {{ selectedAnalytics?.stats?.blocks || 0 | number:'1.2-2'}}</li>
+        <li>Turnovers: {{ selectedAnalytics?.stats?.turnovers || 0 | number:'1.2-2'}}</li>
     </ul>
 </div>
 
 <hr>
 
 <!-- SHOOTING -->
-<div>
-    <h3>Shooting</h3>
+<p>
+    FG%: {{ selectedAnalytics?.shooting?.fg_pct | number:'1.2-2' }}
+</p>
 
-    <p>
-        FG%:
-        {{ selectedAnalytics?.impact?.breakdown?.shooting?.fg_pct || 0 }}
-    </p>
+<p>
+    3P%: {{ selectedAnalytics?.shooting?.three_pct | number:'1.2-2' }}
+</p>
 
-    <p>
-        3P%:
-        {{ selectedAnalytics?.impact?.breakdown?.shooting?.three_pct || 0 }}
-    </p>
-</div>
+<p>
+    TS%: {{ selectedAnalytics?.shooting?.ts_pct | number:'1.2-2' }}
+</p>
 
 <hr>
 
@@ -93,32 +99,32 @@
     <ul>
         <li>
             Points:
-            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.points * 100) | number:'1.0-0' }}%
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.points * 100 || 0) | number:'1.2-2' }}%
         </li>
 
         <li>
             Rebounds:
-            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.rebounds * 100) | number:'1.0-0' }}%
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.rebounds * 100) | number:'1.2-2' }}%
         </li>
 
         <li>
             Assists:
-            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.assists * 100) | number:'1.0-0' }}%
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.assists * 100) | number:'1.2-2' }}%
         </li>
 
         <li>
             Steals:
-            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.steals * 100) | number:'1.0-0' }}%
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.steals * 100) | number:'1.2-2' }}%
         </li>
 
         <li>
             Blocks:
-            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.blocks * 100) | number:'1.0-0' }}%
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.blocks * 100) | number:'1.2-2' }}%
         </li>
 
         <li>
             Turnovers:
-            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.turnovers * 100) | number:'1.0-0' }}%
+            {{ (selectedAnalytics?.impact?.breakdown?.percentiles?.turnovers * 100) | number:'1.2-2' }}%
         </li>
     </ul>
 </div>

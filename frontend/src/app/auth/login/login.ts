@@ -28,6 +28,7 @@ export class Login {
     this.auth.login(this.email, this.password).subscribe({
       next: () => this.router.navigate(['/home']),
       error: err => this.error = err.error.message
+      
     });
   }
 }

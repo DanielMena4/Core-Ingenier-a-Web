@@ -6,9 +6,20 @@
 
     @if (auth.isLoggedIn()) {
 
+    <a routerLink="/lineups" style="color:white;">
+        Alineaciones
+    </a>
+
+    <a routerLink="/player-dashboard" style="color:white;">
+        Analytics
+    </a>
+
     <a routerLink="/players" style="color:white;">
         Jugadores
     </a>
+
+    @if (auth.isAdmin()) {
+
 
     <a routerLink="/teams" style="color:white;">
         Equipos
@@ -18,17 +29,13 @@
         Partidos
     </a>
 
-    <a routerLink="/lineups" style="color:white;">
-        Alineaciones
-    </a>
+    <!--
+            <a routerLink="/stats" style="color:white;">
+                Estadísticas
+            </a>
+            -->
 
-    <a routerLink="/player-dashboard" style="color:white;">
-        Detalles
-    </a>
-
-    <!--<a routerLink="/stats" style="color:white;">
-        Estadisticas
-    </a> -->
+    }
 
     <span style="margin-left:auto;">
         {{ auth.getUser()?.username }}

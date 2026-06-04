@@ -9,7 +9,8 @@ exports.register = async (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, 8);
 
         await db.query(
-            `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`,
+            `INSERT INTO users (username, email, password)
+            VALUES (?, ?, ?)`,
             [username, email, hashedPassword]
         );
 
@@ -39,14 +40,25 @@ exports.login = async (req, res) => {
         if (!valid)
             return res.status(401).json({ message: 'Contraseña incorrecta' });
 
-        const token = jwt.sign({ id: user.id }, 'secret_key', { expiresIn: '2h' });
+        const token = jwt.sign(
+            {
+                id: user.id,
+                username: user.username,
+                role: user.role
+            },
+            'secret_key',
+            {
+                expiresIn: '24h'
+            }
+        );
 
         res.json({
             token,
             user: {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role,
             }
         });
 

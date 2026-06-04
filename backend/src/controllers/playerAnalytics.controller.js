@@ -1,5 +1,7 @@
-const impactService = require('../services/playerImpact.service');
 const db = require('../config/db');
+const analyticsService = require('../services/playerAnalytics.service');
+const impactService = require('../services/playerImpact.service');
+
 
 exports.getPlayerAnalytics = async (req, res) => {
 
@@ -20,24 +22,7 @@ exports.getPlayerAnalytics = async (req, res) => {
             return res.status(404).json({ message: 'Player not found' });
         }
 
-        const [statsRows] = await db.query(`
-            SELECT 
-                SUM(points) as points,
-                SUM(rebounds) as rebounds,
-                SUM(assists) as assists,
-                SUM(steals) as steals,
-                SUM(blocks) as blocks,
-                SUM(turnovers) as turnovers,
-                SUM(minutes) as minutes,
-                SUM(field_goals_made) as fgm,
-                SUM(field_goals_attempted) as fga,
-                SUM(threes_made) as tpm,
-                SUM(threes_attempted) as tpa
-            FROM stats
-            WHERE player_id = ?
-        `, [playerId]);
-
-        const stats = statsRows[0];
+        const analytics = await analyticsService.getPlayerAnalytics(playerId);
 
         const impactList = await impactService.getPlayerImpactScores();
 
@@ -54,7 +39,7 @@ exports.getPlayerAnalytics = async (req, res) => {
 
         return res.json({
             player,
-            stats,
+            analytics,
             impact
         });
 

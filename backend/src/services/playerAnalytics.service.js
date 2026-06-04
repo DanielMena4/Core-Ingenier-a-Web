@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const { generatePlayerStyles } = require('./playerStyles.service');
+const leagueService = require('./leagueAnalytics.service');
 
 class PlayerAnalyticsService {
 
@@ -12,6 +14,13 @@ class PlayerAnalyticsService {
         if (!rows.length) {
             return this.emptyResponse();
         }
+
+        const [playerRows] = await db.query(
+            `SELECT * FROM players WHERE id = ?`,
+            [playerId]
+        );
+
+        const player = playerRows[0] || {};
 
         const games = rows.length;
 
@@ -53,15 +62,20 @@ class PlayerAnalyticsService {
             minutes: 0
         });
 
-
         const safeDiv = (a, b) => (b === 0 ? 0 : a / b);
-
         const avg = (x) => x / games;
 
         const fg_pct = safeDiv(total.fgm, total.fga);
         const three_pct = safeDiv(total.tpm, total.tpa);
         const ft_pct = safeDiv(total.ftm, total.fta);
 
+        const ts_den = total.fga + 0.44 * total.fta;
+        const ts_pct = safeDiv(total.points, 2 * ts_den);
+
+        const efg_pct = safeDiv(
+            total.fgm + 0.5 * total.tpm,
+            total.fga
+        );
 
         const efficiency =
             total.points +
@@ -70,6 +84,30 @@ class PlayerAnalyticsService {
             total.steals * 2 +
             total.blocks * 2 -
             total.turnovers * 1.5;
+
+        const leagueAnalytics = await leagueService.getLeagueAnalytics();
+
+        const stylesObj = generatePlayerStyles(
+            {
+                player_id: playerId,
+                position: player.position,
+                averages: {
+                    points: avg(total.points),
+                    rebounds: avg(total.rebounds),
+                    assists: avg(total.assists),
+                    steals: avg(total.steals),
+                    blocks: avg(total.blocks),
+                },
+                shooting: {
+                    fg_pct,
+                    three_pct,
+                    ft_pct,
+                    ts_pct,
+                    efg_pct
+                }
+            },
+            leagueAnalytics
+        );
 
         return {
             player_id: playerId,
@@ -92,9 +130,13 @@ class PlayerAnalyticsService {
 
             shooting: {
                 fg_pct,
+                efg_pct,
                 three_pct,
-                ft_pct
+                ft_pct,
+                ts_pct
             },
+
+            styles: stylesObj.styles,
 
             totals: total
         };
@@ -106,6 +148,7 @@ class PlayerAnalyticsService {
             averages: {},
             efficiency: { score: 0, per_game: 0 },
             shooting: { fg_pct: 0, three_pct: 0, ft_pct: 0 },
+            styles: [],
             totals: {}
         };
     }

@@ -1,26 +1,145 @@
-<h2>Lineups</h2>
+<h2>Lineup Optimizer</h2>
+
+<div class="optimizer-section">
+
+    <div>
+        <label>Equipo 1:</label>
+
+        <select [(ngModel)]="selectedTeamId" (ngModelChange)="onTeamChange()">
+
+            <option [ngValue]="null">
+                Seleccionar equipo
+            </option>
+
+            @for (team of teams; track team.id) {
+            <option [ngValue]="team.id">
+                {{ team.name }}
+            </option>
+            }
+
+        </select>
+    </div>
+
+    <div>
+        <label>Equipo rival (opcional):</label>
+
+        <select [(ngModel)]="selectedTeamId2" (ngModelChange)="onTeam2Change()">
+
+            <option [ngValue]="null">
+                Sin comparación
+            </option>
+
+            @for (team of teams; track team.id) {
+            <option [ngValue]="team.id">
+                {{ team.name }}
+            </option>
+            }
+
+        </select>
+    </div>
+
+    <div>
+        <label>Modo:</label>
+
+        <select [(ngModel)]="selectedMode" (ngModelChange)="generateOptimalLineup()">
+
+            @for (mode of availableModes; track mode) {
+            <option [ngValue]="mode">
+                {{ mode }}
+            </option>
+            }
+
+        </select>
+    </div>
+
+    <button (click)="generateOptimalLineup()">
+        Generar Lineup Óptimo
+    </button>
+
+</div>
+
+<hr>
+
+@if (loadingLineup) {
+<p>Cargando lineup optimizado...</p>
+}
+
+@if (optimizedLineup) {
+
+<h3>
+    Score Total:
+    {{ optimizedLineup.lineup_score | number:'1.2-2' }}
+</h3>
+
+<table border="1" cellpadding="8">
+
+    <thead>
+        <tr>
+            <th>Jugador</th>
+            <th>Posición</th>
+            <th>Impact</th>
+            <th>Score</th>
+            <th>Styles</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @for (player of optimizedLineup.lineup; track player.player_id) {
+        <tr>
+
+            <td>{{ player.name }}</td>
+            <td>{{ player.position }}</td>
+
+            <td>
+                {{ player.impact_score | number:'1.2-2' }}
+            </td>
+
+            <td>
+                {{ player.lineup_score | number:'1.2-2' }}
+            </td>
+
+            <td>
+                <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    @for (style of player.styles; track style) {
+                    <span>
+                        [{{ style }}]
+                    </span>
+                    }
+                </div>
+            </td>
+
+        </tr>
+        }
+    </tbody>
+
+</table>
+
+}
+
+<hr>
+
+<h2>Mis Lineups</h2>
 
 <form (ngSubmit)="createLineup()">
 
-    <input [(ngModel)]="newLineup.name" name="name" placeholder="Nombre alineación">
+    <input type="text" placeholder="Nombre del lineup" [(ngModel)]="newLineup.name" name="lineupName">
 
-    <select [(ngModel)]="newLineup.team_id" name="team_id">
+    <select [(ngModel)]="newLineup.team_id" name="teamId">
 
         <option [ngValue]="null">
             Seleccionar equipo
         </option>
 
         @for (team of teams; track team.id) {
-
         <option [ngValue]="team.id">
             {{ team.name }}
         </option>
-
         }
+
     </select>
 
     <button type="submit">
-        Crear
+        Crear Lineup
     </button>
 
 </form>
@@ -29,57 +148,217 @@
 
 @if (editingLineup) {
 
-<h3>Editar alineación</h3>
+<h3>Editar Lineup</h3>
 
-<input [(ngModel)]="editingLineup.name">
+<div>
 
-<select [(ngModel)]="editingLineup.team_id">
+    <input type="text" [(ngModel)]="editingLineup.name" name="editName">
 
-    @for (team of teams; track team.id) {
+    <select [(ngModel)]="editingLineup.team_id" name="editTeam">
 
-    <option [ngValue]="team.id">
-        {{ team.name }}
-    </option>
+        @for (team of teams; track team.id) {
+        <option [ngValue]="team.id">
+            {{ team.name }}
+        </option>
+        }
 
-    }
-</select>
+    </select>
 
-<button (click)="updateLineup()">
-    Guardar
+    <button (click)="updateLineup()">
+        Guardar
+    </button>
+
+    <button (click)="editingLineup = null">
+        Cancelar
+    </button>
+
+</div>
+
+<hr>
+
+}
+
+<table border="1" cellpadding="8">
+
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Equipo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @for (lineup of lineups; track lineup.id) {
+        <tr>
+
+            <td>{{ lineup.name }}</td>
+            <td>{{ lineup.team_name }}</td>
+
+            <td>
+
+                <button (click)="selectLineup(lineup)">
+                    Abrir
+                </button>
+
+                <button (click)="editLineup(lineup)">
+                    Editar
+                </button>
+
+                <button (click)="deleteLineup(lineup.id)">
+                    Eliminar
+                </button>
+
+            </td>
+
+        </tr>
+        }
+
+    </tbody>
+
+</table>
+
+<hr>
+
+@if (selectedLineup) {
+
+<h2>
+    Gestionando Lineup:
+    {{ selectedLineup.name }}
+</h2>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+    <!-- SELECCIONADOS -->
+    <div>
+
+        <h3>Jugadores Seleccionados</h3>
+
+        <table border="1" cellpadding="8">
+
+            <thead>
+                <tr>
+                    <th>Jugador</th>
+                    <th>Posición</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (player of selectedPlayers; track player.id) {
+                <tr>
+                    <td>{{ player.name }}</td>
+                    <td>{{ player.position }}</td>
+                    <td>
+                        <button (click)="removePlayer(player.id)">
+                            Quitar
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- DISPONIBLES -->
+    <div>
+
+        <h3>Jugadores Disponibles</h3>
+
+        <table border="1" cellpadding="8">
+
+            <thead>
+                <tr>
+                    <th>Jugador</th>
+                    <th>Posición</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (player of availablePlayers; track player.id) {
+                <tr>
+                    <td>{{ player.name }}</td>
+                    <td>{{ player.position }}</td>
+                    <td>
+                        <button (click)="addPlayer(player.id)">
+                            Agregar
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<br>
+
+<button (click)="calculateLineup()">
+    Recalcular Lineup
 </button>
 
 }
 
 <hr>
 
-@if (lineups.length > 0) {
+@if (loadingCalculation) {
+<p>Calculando lineup...</p>
+}
 
-<ul>
+@if (calculatedLineup) {
 
-    @for (lineup of lineups; track lineup.id) {
+<h2>
+    Análisis: {{ selectedLineup?.name }}
+</h2>
 
-    <li>
+<h3>
+    Impact Score Total:
+    {{ calculatedLineup.lineup_score | number:'1.2-2' }}
+</h3>
 
-        {{ lineup.name }}
-        -
-        {{ lineup.team_name }}
+<table border="1" cellpadding="8">
 
-        <button (click)="editLineup(lineup)">
-            Editar
-        </button>
+    <thead>
+        <tr>
+            <th>Jugador</th>
+            <th>Posición</th>
+            <th>Impact Score</th>
+            <th>Styles</th>
+        </tr>
+    </thead>
 
-        <button (click)="deleteLineup(lineup.id)">
-            Eliminar
-        </button>
+    <tbody>
+        @for (player of calculatedLineup.lineup; track player.player_id) {
+        <tr>
 
-    </li>
+            <td>{{ player.name }}</td>
+            <td>{{ player.position }}</td>
 
-    }
+            <td>
+                {{ player.impact_score | number:'1.2-2' }}
+            </td>
 
-</ul>
+            <td>
+                <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    @for (style of player.styles; track style) {
+                    <span>
+                        [{{ style }}]
+                    </span>
+                    }
+                </div>
+            </td>
 
-} @else {
+        </tr>
+        }
+    </tbody>
 
-<p>No hay alineaciones</p>
+</table>
 
 }

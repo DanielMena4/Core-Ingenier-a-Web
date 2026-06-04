@@ -7,13 +7,10 @@ async function getPlayerStyles(req, res) {
     try {
         const playerId = req.params.id;
 
-        // 1. traer datos del jugador
         const playerAnalytics = await getPlayerAnalytics(playerId);
 
-        // 2. traer datos de la liga
         const leagueAnalytics = await getLeagueAnalytics();
 
-        // 3. generar estilos
         const result = generatePlayerStyles(playerAnalytics, leagueAnalytics);
 
         res.json(result);

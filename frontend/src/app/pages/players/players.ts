@@ -1,6 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 import { PlayerService } from '../../services/player.service';
 import { TeamService } from '../../services/team.service';
@@ -15,6 +17,7 @@ export class Players implements OnInit {
 
   players: any[] = [];
   teams: any[] = [];
+  groupedPlayers: { [key: string]: any[] } = {};
   editingPlayer: any = null;
 
   positions: string[] = ['PG', 'SG', 'SF', 'PF', 'C'];
@@ -29,7 +32,9 @@ export class Players implements OnInit {
   constructor(
     private playerService: PlayerService,
     private teamService: TeamService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public auth: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -38,12 +43,36 @@ export class Players implements OnInit {
   }
 
   loadPlayers() {
+
     this.playerService.getPlayers().subscribe({
+
       next: (data) => {
+
         this.players = data;
+
+        this.groupedPlayers = {};
+
+        data.forEach((player: any) => {
+
+          const teamName =
+            player.team_name || 'Sin equipo';
+
+          if (!this.groupedPlayers[teamName]) {
+
+            this.groupedPlayers[teamName] = [];
+          }
+
+          this.groupedPlayers[teamName].push(player);
+        });
+
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error loading players:', err)
+
+      error: (err) =>
+        console.error(
+          'Error loading players:',
+          err
+        )
     });
   }
 
@@ -99,5 +128,12 @@ export class Players implements OnInit {
       },
       error: (err) => console.error('Error updating player:', err)
     });
+  }
+  viewPlayer(playerId: number) {
+
+    this.router.navigate([
+      '/player-dashboard',
+      playerId
+    ]);
   }
 }

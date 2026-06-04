@@ -10,18 +10,73 @@ import { Matches } from './pages/matches/matches';
 import { Lineups } from './pages/lineups/lineups';
 import { LineupDetails } from './pages/lineup-details/lineup-details';
 import { Stats } from './pages/stats/stats';
+import { AdminGuard } from './guards/admin-guard';
 import { PlayerDashboard } from './pages/player-dashboard/player-dashboard';
 
 export const routes: Routes = [
+
     { path: '', component: Login },
+
     { path: 'register', component: Register },
+
     { path: 'home', component: Home, canActivate: [AuthGuard] },
-    { path: 'players', component: Players, canActivate: [AuthGuard] },
-    { path: 'teams', component: Teams, canActivate: [AuthGuard] },
-    { path: 'matches', component: Matches, canActivate: [AuthGuard] },
-    { path: 'lineups', component: Lineups, canActivate: [AuthGuard] },
-    { path: 'lineup-details', component: LineupDetails, canActivate: [AuthGuard] },
-    { path: 'stats', component: Stats, canActivate: [AuthGuard] },
-    { path: 'matches/:id', loadComponent: () => import('./pages/match-detail/match-detail').then(m => m.MatchDetail) },
-    {path: 'player-dashboard', loadComponent: () => import('./pages/player-dashboard/player-dashboard') .then(m => m.PlayerDashboard) }
+
+    {
+        path: 'players',
+        component: Players,
+        canActivate: [AuthGuard]
+    },
+
+    {
+        path: 'teams',
+        component: Teams,
+        canActivate: [AuthGuard, AdminGuard]
+    },
+
+    {
+        path: 'matches',
+        component: Matches,
+        canActivate: [AuthGuard, AdminGuard]
+    },
+
+    {
+        path: 'stats',
+        component: Stats,
+        canActivate: [AuthGuard, AdminGuard]
+    },
+
+    {
+        path: 'lineups',
+        component: Lineups,
+        canActivate: [AuthGuard]
+    },
+
+    {
+    path: 'lineups/:id',
+    component: LineupDetails,
+    canActivate: [AuthGuard]
+},
+
+    {
+        path: 'player-dashboard',
+        component: PlayerDashboard,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'player-dashboard/:id',
+        component: PlayerDashboard,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'matches/:id',
+        loadComponent: () =>
+            import('./pages/match-detail/match-detail')
+                .then(m => m.MatchDetail),
+        canActivate: [AuthGuard]
+    },
+
+    {
+        path: '**',
+        redirectTo: 'home'
+    }
 ];

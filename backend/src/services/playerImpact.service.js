@@ -14,14 +14,12 @@ const getPlayerImpactScores = async () => {
 
     try {
 
-        // 1. LEAGUE ANALYTICS
         const league = await leagueService.getLeagueAnalytics();
 
         if (!league || !league.metrics) {
             throw new Error('League analytics inválido');
         }
 
-        // 2. MAPA DE PERCENTILES POR JUGADOR
         const leagueMap = new Map();
         const metrics = league.metrics;
 
@@ -40,17 +38,15 @@ const getPlayerImpactScores = async () => {
                     });
                 }
 
-                const percentileValue = Number(item.percentile);
-
                 leagueMap.get(playerId).percentiles[metricName] =
-                    isNaN(percentileValue) ? 0 : percentileValue;
+                    Number(item.percentile || 0);
             });
         });
 
-        // 3. STATS AGREGADAS
         const [players] = await db.query(`
             SELECT
                 player_id,
+
                 SUM(points) as points,
                 SUM(rebounds) as rebounds,
                 SUM(assists) as assists,
@@ -58,25 +54,31 @@ const getPlayerImpactScores = async () => {
                 SUM(blocks) as blocks,
                 SUM(turnovers) as turnovers,
                 SUM(minutes) as minutes,
+
                 SUM(field_goals_made) as fgm,
                 SUM(field_goals_attempted) as fga,
+
                 SUM(threes_made) as tpm,
-                SUM(threes_attempted) as tpa
+                SUM(threes_attempted) as tpa,
+
+                SUM(free_throws_made) as ftm,
+                SUM(free_throws_attempted) as fta
+
             FROM stats
             GROUP BY player_id
         `);
 
-        if (!players || !players.length) {
+        if (!players.length) {
             return [];
         }
 
-        // 4. CALCULO IMPACT SCORE
         const result = players.map(p => {
 
             const playerId = Number(p.player_id);
-            const l = leagueMap.get(playerId);
 
-            if (!l || !l.percentiles) {
+            const leaguePlayer = leagueMap.get(playerId);
+
+            if (!leaguePlayer) {
                 return {
                     player_id: playerId,
                     impact_score: 0,
@@ -84,39 +86,91 @@ const getPlayerImpactScores = async () => {
                 };
             }
 
-            const pct = l.percentiles;
+            const pct = leaguePlayer.percentiles;
 
-            // shooting
-            const fg_pct = p.fga ? safe(p.fgm) / safe(p.fga) : 0;
-            const three_pct = p.tpa ? safe(p.tpm) / safe(p.tpa) : 0;
+            const fg_pct =
+                safe(p.fga) === 0
+                    ? 0
+                    : safe(p.fgm) / safe(p.fga);
 
-            // IMPACT SCORE
+            const three_pct =
+                safe(p.tpa) === 0
+                    ? 0
+                    : safe(p.tpm) / safe(p.tpa);
+
+            const ft_pct =
+                safe(p.fta) === 0
+                    ? 0
+                    : safe(p.ftm) / safe(p.fta);
+
+            const ts_pct =
+                (safe(p.fga) + safe(p.fta)) === 0
+                    ? 0
+                    : safe(p.points) /
+                    (
+                        2 *
+                        (
+                            safe(p.fga) +
+                            (0.44 * safe(p.fta))
+                        )
+                    );
+
             let impact =
-                safe(pct.points) * 0.25 +
-                safe(pct.rebounds) * 0.15 +
-                safe(pct.assists) * 0.15 +
-                safe(pct.steals) * 0.10 +
-                safe(pct.blocks) * 0.10 +
-                (fg_pct * 100) * 0.10 +
-                (three_pct * 100) * 0.10 +
-                safe(pct.minutes) * 0.05;
 
-            // penalización turnovers
-            impact -= safe(pct.turnovers) * 0.10;
+                // Producción ofensiva
+                safe(pct.points) * 20 +
 
-            // FIX FINAL: evitar NaN
-            impact = isNaN(impact) ? 0 : impact;
+                // Creación
+                safe(pct.assists) * 15 +
+
+                // Rebote
+                safe(pct.rebounds) * 12 +
+
+                // Defensa
+                safe(pct.steals) * 10 +
+                safe(pct.blocks) * 10 +
+
+                // Disponibilidad
+                safe(pct.minutes) * 8 +
+
+                // Eficiencia moderna
+                (ts_pct * 25);
+
+            // Penalización pérdidas
+            impact -= safe(pct.turnovers) * 5;
+
+            impact = clamp(impact);
 
             return {
+
                 player_id: playerId,
-                impact_score: Number(clamp(impact).toFixed(2)),
+
+                impact_score: Number(
+                    impact.toFixed(2)
+                ),
 
                 breakdown: {
+
                     shooting: {
-                        fg_pct: Number(fg_pct.toFixed(3)),
-                        three_pct: Number(three_pct.toFixed(3))
+
+                        fg_pct: Number(
+                            fg_pct.toFixed(3)
+                        ),
+
+                        three_pct: Number(
+                            three_pct.toFixed(3)
+                        ),
+
+                        ft_pct: Number(
+                            ft_pct.toFixed(3)
+                        ),
+
+                        ts_pct: Number(
+                            ts_pct.toFixed(3)
+                        )
                     },
-                    percentiles: pct
+
+                    percentiles: pct,
                 }
             };
         });
@@ -124,7 +178,12 @@ const getPlayerImpactScores = async () => {
         return result;
 
     } catch (err) {
-        console.error('Impact Service Error:', err);
+
+        console.error(
+            'Impact Service Error:',
+            err
+        );
+
         throw err;
     }
 };

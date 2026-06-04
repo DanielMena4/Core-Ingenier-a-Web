@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PlayerService } from '../../services/player.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -11,29 +12,56 @@ import { PlayerService } from '../../services/player.service';
 export class PlayerDashboard implements OnInit {
 
   players: any[] = [];
+  playerIdFromRoute: number | null = null;
   selectedPlayerId: number | null = null;
 
   selectedAnalytics: any = null;
 
   constructor(
+    private route: ActivatedRoute,
     private playerService: PlayerService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
+
+    const id =
+      this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+
+      this.playerIdFromRoute =
+        Number(id);
+
+      this.selectedPlayerId =
+        this.playerIdFromRoute;
+    }
+
     this.loadPlayers();
   }
 
   loadPlayers() {
+
     this.playerService.getPlayers().subscribe({
+
       next: (data) => {
+
         this.players = data;
+
+        if (this.playerIdFromRoute) {
+
+          this.selectedPlayerId =
+            this.playerIdFromRoute;
+
+          this.loadPlayerAnalytics();
+        }
+
         this.cdr.detectChanges();
       },
+
       error: (err) => console.error(err)
     });
   }
-
   loadPlayerAnalytics() {
 
     if (!this.selectedPlayerId) {
@@ -44,36 +72,33 @@ export class PlayerDashboard implements OnInit {
     this.playerService.getPlayerAnalytics(this.selectedPlayerId).subscribe({
       next: (data) => {
 
-        console.log('ANALYTICS:', data);
-
-        const stats = data?.stats || {};
-        const games = data?.games || 1;
+        const analytics = data?.analytics;
+        const impact = data?.impact;
+        const player = data?.player;
 
         this.selectedAnalytics = {
-          player: data?.player || null,
+          player,
 
-          stats: {
-            points: Number(stats.points) / games,
-            rebounds: Number(stats.rebounds) / games,
-            assists: Number(stats.assists) / games,
-            steals: Number(stats.steals) / games,
-            blocks: Number(stats.blocks) / games,
-            turnovers: Number(stats.turnovers) / games
-          },
+          stats: analytics?.averages ?? {},
+
+          shooting: analytics?.shooting ?? {},
+
+          efficiency: analytics?.efficiency ?? {},
+
+          styles: analytics?.styles ?? [],
 
           impact: {
-            impact_score: data?.impact?.impact_score ?? 0,
-            breakdown: data?.impact?.breakdown || {}
+            impact_score: impact?.impact_score ?? 0,
+            breakdown: impact?.breakdown ?? {
+              percentiles: {},
+              shooting: {}
+            }
           },
 
-          styles: data?.styles || { styles: [] }
+          totals: analytics?.totals ?? {}
         };
 
         this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error(err);
-        this.selectedAnalytics = null;
       }
     });
   }
