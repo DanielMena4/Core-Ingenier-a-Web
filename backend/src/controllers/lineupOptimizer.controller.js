@@ -6,11 +6,15 @@ exports.getOptimalLineup = async (req, res) => {
 
         const teamId = Number(req.params.teamId);
         const mode = req.query.mode || 'BALANCED';
+        const opponentTeamId = req.query.opponentTeamId
+            ? Number(req.query.opponentTeamId)
+            : null;
 
         const players =
             await engine.buildPlayerProfiles({
                 teamId,
-                mode
+                mode,
+                opponentTeamId
             });
 
         const sorted =
@@ -38,7 +42,8 @@ exports.getOptimalLineup = async (req, res) => {
         const result =
             await engine.calculateLineupEngine({
                 playerIds: lineup.map(p => p.player_id),
-                mode
+                mode,
+                opponentTeamId
             });
 
         res.json(result);

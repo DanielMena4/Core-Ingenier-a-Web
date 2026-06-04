@@ -6,7 +6,12 @@ exports.calculateLineup = async (req, res) => {
     try {
 
         const lineupId = Number(req.params.id);
+
         const mode = req.query.mode || 'BALANCED';
+
+        const opponentTeamId = req.query.opponentTeamId
+            ? Number(req.query.opponentTeamId)
+            : null;
 
         const [rows] = await db.query(`
             SELECT player_id
@@ -18,7 +23,8 @@ exports.calculateLineup = async (req, res) => {
 
         const result = await calculateLineupEngine({
             playerIds,
-            mode
+            mode,
+            opponentTeamId
         });
 
         res.json(result);
@@ -28,7 +34,6 @@ exports.calculateLineup = async (req, res) => {
         res.status(500).json({ message: 'Error calculating lineup' });
     }
 };
-
 exports.getLineups = async (req, res) => {
 
     const [rows] = await db.query(`

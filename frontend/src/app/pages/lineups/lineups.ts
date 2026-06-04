@@ -145,18 +145,25 @@ export class Lineups implements OnInit {
   }
 
   onTeam2Change() {
-    this.selectedMode = 'VS_INTERIOR';
     this.generateOptimalLineup();
   }
-
   generateOptimalLineup() {
+
     if (!this.selectedTeamId) return;
 
     this.request$.next();
     this.loadingLineup = true;
 
+    const params: any = {
+      teamId: this.selectedTeamId
+    };
+
+    if (this.selectedTeamId2) {
+      params.opponentTeamId = Number(this.selectedTeamId2);
+    }
+
     this.lineupService
-      .getOptimalLineup(this.selectedTeamId, this.selectedMode)
+      .getOptimalLineup(params)
       .pipe(takeUntil(this.request$))
       .subscribe({
         next: (data) => {
@@ -176,8 +183,6 @@ export class Lineups implements OnInit {
 
     this.lineupService.getLineup(lineup.id).subscribe({
       next: (data) => {
-
-        console.log('LINEUP DATA:', data);
 
         this.selectedPlayers = data.players || [];
 
@@ -209,8 +214,6 @@ export class Lineups implements OnInit {
         next: (data) => {
           this.calculatedLineup = data;
           this.loadingCalculation = false;
-
-          console.log(data);
 
           this.cdr.detectChanges();
         },

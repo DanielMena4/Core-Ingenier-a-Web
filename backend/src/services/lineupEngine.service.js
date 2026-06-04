@@ -22,14 +22,16 @@ function getStyleMultiplier(styles = [], mode = 'BALANCED') {
             'Perimeter Defender': 0.08
         },
         VS_INTERIOR: {
-            'Defensive Anchor': 0.15,
-            Rebounder: 0.12,
-            'Rim Protector': 0.08
+            'Defensive Anchor': 0.18,
+            Rebounder: 0.15,
+            'Rim Protector': 0.12,
+            'Perimeter Defender': 0.05
         },
         VS_EXTERIOR: {
-            Shooter: 0.10,
-            Playmaker: 0.10,
-            'Perimeter Defender': 0.12
+            Shooter: 0.15,
+            Playmaker: 0.12,
+            'Perimeter Defender': 0.15,
+            'Efficient Scorer': 0.08
         },
         BALANCED: {
             Scorer: 0.05,
@@ -45,6 +47,7 @@ function getStyleMultiplier(styles = [], mode = 'BALANCED') {
 
     let multiplier = 1;
 
+
     for (const style of styles) {
         if (modeRules[style]) {
             multiplier += modeRules[style];
@@ -53,7 +56,6 @@ function getStyleMultiplier(styles = [], mode = 'BALANCED') {
 
     return multiplier;
 }
-
 
 function calculateSynergyBonus(lineup) {
 
@@ -153,11 +155,24 @@ async function buildPlayerProfiles({ teamId = null, playerIds = null, mode }) {
 async function calculateLineupEngine({
     teamId = null,
     playerIds = null,
+    opponentTeamId = null,
     mode = 'BALANCED'
 }) {
 
+    let finalMode = mode;
+
+    if (opponentTeamId) {
+
+        const [rows] = await db.query(`
+        SELECT id, position
+        FROM players
+        WHERE team_id = ?
+    `, [opponentTeamId]);
+
+        finalMode = detectVsMode(rows);
+    }
     const players =
-        await buildPlayerProfiles({ teamId, playerIds, mode });
+        await buildPlayerProfiles({ teamId, playerIds, mode: finalMode });
 
     if (!players.length) {
         return {
@@ -195,11 +210,65 @@ async function calculateLineupEngine({
 
     score += calculateSynergyBonus(lineup);
     score -= calculateCompositionPenalty(lineup);
+    score += calculateMatchupBonus(lineup, finalMode);
 
     return {
         lineup_score: Number(score.toFixed(2)),
-        lineup
+        lineup,
+        mode: finalMode
     };
+}
+function detectVsMode(opponentPlayers = []) {
+
+    let interior = 0;
+    let exterior = 0;
+
+    for (const p of opponentPlayers) {
+
+        const styles = p.styles || [];
+
+        if (['C', 'PF'].includes(p.position)) interior += 2;
+        if (['PG', 'SG'].includes(p.position)) exterior += 2;
+        if (styles.includes('Rebounder') || styles.includes('Rim Protector')) {
+            interior += 2;
+        }
+
+        if (styles.includes('Shooter') || styles.includes('Playmaker')) {
+            exterior += 2;
+        }
+
+        if (styles.includes('Defensive Anchor')) {
+            interior += 1;
+        }
+
+        if (styles.includes('Perimeter Defender')) {
+            exterior += 1;
+        }
+    }
+
+    if (interior > exterior * 1.2) return 'VS_INTERIOR';
+    if (exterior > interior * 1.2) return 'VS_EXTERIOR';
+
+    return 'BALANCED';
+}
+
+function calculateMatchupBonus(lineup, mode) {
+
+    let bonus = 0;
+
+    if (mode === 'VS_INTERIOR') {
+        bonus += lineup.filter(p =>
+            p.styles.includes('Shooter')
+        ).length * 5;
+    }
+
+    if (mode === 'VS_EXTERIOR') {
+        bonus += lineup.filter(p =>
+            p.styles.includes('Defensive Anchor')
+        ).length * 6;
+    }
+
+    return bonus;
 }
 
 module.exports = {
