@@ -84,7 +84,7 @@
     </thead>
 
     <tbody>
-        @for (player of optimizedLineup.lineup; track player.player_id) {
+        @for (player of (optimizedLineup?.lineup || []); track player.player_id) {
         <tr>
 
             <td>{{ player.name }}</td>
@@ -100,7 +100,7 @@
 
             <td>
                 <div style="display:flex; flex-wrap:wrap; gap:5px;">
-                    @for (style of player.styles; track style) {
+                    @for (style of (player.styles?.styles || []); track style) {
                     <span>
                         [{{ style }}]
                     </span>
@@ -114,6 +114,59 @@
 
 </table>
 
+@if (selectedTeamId2){
+
+<H3>Equipo Contrario</H3>
+
+<button (click)="generateOptimalLineup2()">
+    Mostrar Lineup Probable
+</button>
+
+@if (optimizedLineup2){
+<table border="1" cellpadding="8">
+
+    <thead>
+        <tr>
+            <th>Jugador</th>
+            <th>Posición</th>
+            <th>Impact</th>
+            <th>Score</th>
+            <th>Styles</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @for (player of (optimizedLineup2?.lineup || []); track player.player_id) {
+        <tr>
+
+            <td>{{ player.name }}</td>
+            <td>{{ player.position }}</td>
+
+            <td>
+                {{ player.impact_score | number:'1.2-2' }}
+            </td>
+
+            <td>
+                {{ player.lineup_score | number:'1.2-2' }}
+            </td>
+
+            <td>
+                <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    @for (style of (player.styles?.styles|| []); track style) {
+                    <span>
+                        [{{ style }}]
+                    </span>
+                    }
+                </div>
+            </td>
+
+        </tr>
+        }
+    </tbody>
+
+</table>
+}
+}
 }
 
 <hr>
@@ -347,7 +400,7 @@
 
             <td>
                 <div style="display:flex; flex-wrap:wrap; gap:5px;">
-                    @for (style of player.styles; track style) {
+                    @for (style of player.styles?.styles; track style) {
                     <span>
                         [{{ style }}]
                     </span>

@@ -50,6 +50,7 @@ export class Lineups implements OnInit {
   selectedMode = 'BALANCED';
 
   optimizedLineup: any = null;
+  optimizedLineup2: any = null;
   loadingLineup = false;
 
   private request$ = new Subject<void>();
@@ -155,8 +156,10 @@ export class Lineups implements OnInit {
     this.loadingLineup = true;
 
     const params: any = {
-      teamId: this.selectedTeamId
+      teamId: this.selectedTeamId,
+      mode: this.selectedMode
     };
+
 
     if (this.selectedTeamId2) {
       params.opponentTeamId = Number(this.selectedTeamId2);
@@ -168,6 +171,41 @@ export class Lineups implements OnInit {
       .subscribe({
         next: (data) => {
           this.optimizedLineup = data;
+          console.log(this.optimizedLineup);
+          this.loadingLineup = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error(err);
+          this.loadingLineup = false;
+        }
+      });
+  }
+
+  generateOptimalLineup2() {
+
+    if (!this.selectedTeamId2) return;
+
+    this.request$.next();
+    this.loadingLineup = true;
+
+    const params: any = {
+      teamId: this.selectedTeamId2,
+      mode: this.selectedMode
+    };
+
+    if (this.selectedTeamId2) {
+      params.opponentTeamId = Number(this.selectedTeamId);
+    }
+
+    this.lineupService
+      .getOptimalLineup(params)
+      .pipe(takeUntil(this.request$))
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.optimizedLineup2 = data;
+          console.log(this.optimizedLineup);
           this.loadingLineup = false;
           this.cdr.detectChanges();
         },

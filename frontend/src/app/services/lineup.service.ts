@@ -68,6 +68,10 @@ export class LineupService {
     let httpParams = new HttpParams()
       .set('teamId', params.teamId);
 
+    if (params.mode) {
+      httpParams = httpParams.set('mode', params.mode);
+    }
+
     if (params.opponentTeamId !== null && params.opponentTeamId !== undefined) {
       httpParams = httpParams.set('opponentTeamId', params.opponentTeamId.toString());
     }
